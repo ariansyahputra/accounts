@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block title %}Profile{% endblock %} {% block content %}
+<section>
+    <h2>Profile</h2>
+
+    <h4>Username</h4>
+    {{ user.username }}
+    <h4>First Name</h4>
+    {{ user.first_name }}
+    <h4>Last Name</h4>
+    {{ user.last_name }}
+    <h4>Email Address</h4>
+    {{ user.email }}
+    <h4>Joined</h4>
+    {{ user.joined }}
+</section>
+{% endblock %}
