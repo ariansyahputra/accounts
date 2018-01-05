@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^accounts/login', auth_views.login, name='login'),
     url(r'^accounts/logout', auth_views.logout, name='logout'),
     url(r'^admin/', admin.site.urls),
+    url(r'^payments/', include('djstripe.urls', namespace="djstripe")),
     url('', include('social_django.urls', namespace='social')),
     url(r'^accounts/', include('accountpage.urls')),
     url('^$', generic.RedirectView.as_view(url='/accounts/profile/'), name="index"),

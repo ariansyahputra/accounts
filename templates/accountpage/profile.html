@@ -1,4 +1,105 @@
-{% extends 'base.html' %} {% block title %}Profile{% endblock %} {% block content %}
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(event) {
+     // Create a Stripe client
+     var stripe = Stripe('pk_test_aPQFfHx96Qeznh5tFGzW3H6T');
+
+     // Create an instance of Elements
+     var elements = stripe.elements();
+
+     // Custom styling can be passed to options when creating an Element.
+     // (Note that this demo uses a wider set of styles than the guide below.)
+     var style = {
+         base: {
+             color: '#32325d',
+             lineHeight: '18px',
+             fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+             fontSmoothing: 'antialiased',
+             fontSize: '16px',
+             '::placeholder': {
+                 color: '#aab7c4'
+             }
+         },
+         invalid: {
+             color: '#fa755a',
+             iconColor: '#fa755a'
+         }
+     };
+     
+     // Create an instance of the card Element
+     var card = elements.create('card', {style: style});
+     
+     // Add an instance of the card Element into the `card-element` <div>
+     card.mount('#card-element');
+ 
+     // Handle real-time validation errors from the card Element.
+     card.addEventListener('change', function(event) {
+         var displayError = document.getElementById('card-errors');
+         if (event.error) {
+             displayError.textContent = event.error.message;
+         } else {
+             displayError.textContent = '';
+         }
+     });
+     
+     // Handle form submission
+     var form = document.getElementById('payment-form');
+     form.addEventListener('submit', function(event) {
+         event.preventDefault();
+         
+         stripe.createToken(card).then(function(result) {
+             if (result.error) {
+                 // Inform the user if there was an error
+                 var errorElement = document.getElementById('card-errors');
+                 errorElement.textContent = result.error.message;
+             } else {
+                 // Send the token to your server
+                 var input = document.getElementById('stripe_token');
+                 input.value = result.token.id
+                 var form = document.getElementById('payment-form');
+                 form.submit();
+             }
+         });
+     });
+ });
+</script>
+<style type="text/style">
+/**
+ * The CSS shown here will not be introduced in the Quickstart guide, but shows
+ * how you can use CSS to style your Element's container.
+ */
+.StripeElement {
+  background-color: white;
+  height: 40px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+</style>
+{% endblock %}
+
+{% block content %}
 <section>
     <h2>Profile</h2>
 
@@ -11,6 +112,54 @@
     <h4>Email Address</h4>
     {{ user.email }}
     <h4>Joined</h4>
-    {{ user.joined }}
+    {{ user.date_joined|date:"SHORT_DATE_FORMAT" }}
+
+    <h4>Has default payment Method</h4>
+    {% if default_source %}
+        <div>
+            <i class="fa fa-cc-{{ default_source.brand|lower }}"></i>
+            {{ default_source.last4 }}<br />
+        </div>
+    {% else %}
+No default card found!
+    {% endif %}
+    <h4>Payment Sources</h4>
+    <div>
+        {% if sources %}
+        {% for source in sources %}
+        <div>
+            <i class="fa fa-cc-{{ source.brand|lower }}"></i>
+            {{ source.last4 }}<br />
+            Expires {{ source.exp_month }}/{{ source.exp_year }}<br />
+            <a href="/accounts/remove_card/{{ source.stripe_id }}/">
+                Remove
+            </a>
+            <a href="/accounts/make_default_card/{{ source.stripe_id }}/">
+                Make Card default
+            </a>
+        </div>
+        {% endfor %}
+        {% else %}
+            No payment sources found!
+        {% endif %}
+        <br /><br />
+        <form action="/accounts/add_card/" method="post" id="payment-form">
+            {% csrf_token %}
+            <div class="form-row">
+                <label for="card-element">
+                    Credit or debit card
+                </label>
+                <div id="card-element">
+                    <!-- a Stripe Element will be inserted here. -->
+                </div>
+
+                <!-- Used to display form errors -->
+                <div id="card-errors" role="alert"></div>
+                <input id="stripe_token" name="stripe-token" type="hidden"></div>
+            </div>
+
+            <button>Add Card</button>
+        </form>
+    </div>
 </section>
 {% endblock %}

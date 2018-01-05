@@ -1,2 +1,5 @@
-django
+django==1.10
 social-auth-app-django
+git+git://github.com/dj-stripe/dj-stripe.git@stable#egg=dj-stripe
+sqlparse
+django-polymorphic==1.3
