@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djstripe',
@@ -98,11 +97,12 @@ SOCIAL_AUTH_GITHUB_SECRET = ''
 
 # Stripe API Keys
 # Set callback URL on Stripe to http://example.com/???
-STRIPE_LIVE_PUBLIC_KEY = "<your publishable key>"
-STRIPE_LIVE_SECRET_KEY = "<your secret key>"
-STRIPE_TEST_PUBLIC_KEY = "<your publishable key>"
-STRIPE_TEST_SECRET_KEY = "<your secret key>"
+STRIPE_LIVE_PUBLIC_KEY = ''
+STRIPE_LIVE_SECRET_KEY = ''
+STRIPE_TEST_PUBLIC_KEY = ''
+STRIPE_TEST_SECRET_KEY = ''
 STRIPE_LIVE_MODE = False
+STRIPE_API_VERSION = '2017-06-05'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
