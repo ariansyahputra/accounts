@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'remove_card/([^/]+)/', remove_card_view),
     url(r'make_default_card/([^/]+)/', make_default_card_view),
     url(r'subscribe/', subscribe),
+    url(r'cancel_subscription/([^/]+)/', cancel_subscription),
 ]

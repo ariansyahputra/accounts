@@ -122,7 +122,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
         </div>
     {% else %}
 No default card found!
-    {% endif %}
+        {% endif %}
+    <h4>Subscriptions</h4>
+    <div>
+        {% if subscriptions %}
+        {% for sub in subscriptions %}
+        <div>
+            Status: {{ sub.status }}<br />
+            Started: {{ sub.start|date:"SHORT_DATE_FORMAT" }}<br />
+            {% if sub.cancel_at_period_end %}
+            Runs out on:&nbsp;
+            {% else %}
+            Renews:&nbsp;
+            {%endif %}
+            {{ sub.current_period_end|date:"SHORT_DATE_FORMAT" }}<br />
+            Plan: <br/>
+            {{ sub.plan.name }}<br />
+            {{ sub.plan.amount }} {{ sub.plan.currency }}<br />
+
+            <a href="/accounts/cancel_subscription/{{ sub.stripe_id }}/">
+                Cancel
+            </a>
+        </div>
+        {% endfor %}
+        {% else %}
+        No subscription found, go subscribe to the <a href="/accounts/subscribe/"> Developer Plan</a>!
+        {% endif %}
+        <br /><br />
+    </div>
     <h4>Payment Sources</h4>
     <div>
         {% if sources %}

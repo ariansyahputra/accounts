@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 import datetime
 from django.contrib.auth.decorators import login_required
-from djstripe.models import Customer, Card, Plan
+from djstripe.models import Customer, Card, Plan, Subscription
 # import the logging library
 import logging
 
@@ -12,18 +12,19 @@ logger = logging.getLogger('django')
 
 @login_required
 def profile_view(request):
-    (st_customer, _) = Customer.get_or_create(request.user)
+    (customer, _) = Customer.get_or_create(request.user)
 
-    if st_customer.default_source:
-        default_source = st_customer.default_source
+    if customer.default_source:
+        default_source = customer.default_source
     else:
         default_source = None
 
     context = {
         'user': request.user,
-        'customer': st_customer,
+        'customer': customer,
         'default_source': default_source,
-        'sources': st_customer.sources.all(),
+        'sources': customer.sources.all(),
+        'subscriptions': customer.subscriptions.all(),
     }
     return render(request, 'accountpage/profile.html', context)
 
@@ -86,3 +87,16 @@ def subscribe(request):
     customer.subscribe(plan)
 
     return redirect('/accounts/profile')
+
+@login_required
+def cancel_subscription(request, sub_id = ''):
+    if sub_id == '':
+        return redirect('/accounts/profile')
+
+    subscription = Subscription.objects.get(stripe_id=sub_id)
+
+    if not (subscription.customer.subscriber == request.user):
+        logger.debug('Not your subscription')
+        return redirect('/accounts/profile')
+
+    subscription.cancel()
