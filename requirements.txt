@@ -1,4 +1,4 @@
-django==1.10
+django==1.11.18
 social-auth-app-django
 git+git://github.com/dj-stripe/dj-stripe.git@stable#egg=dj-stripe
 sqlparse
